@@ -1,6 +1,25 @@
 #include <asio.hpp>
 #include <iostream>
 #include <memory>
+#include <thread>
+#include <vector>
+
+void BroadcastServerPresence(asio::io_context &context, uint16_t tcp_port) {
+    asio::ip::udp::socket broadcast_socket(
+        context, asio::ip::udp::endpoint(asio::ip::udp::v4(), 0));
+    broadcast_socket.set_option(asio::socket_base::broadcast(true));
+
+    asio::ip::udp::endpoint broadcast_endpoint(
+        asio::ip::address_v4::broadcast(), 12345);
+
+    std::string message =
+        "Server is running on port: " + std::to_string(tcp_port);
+
+    while (true) {
+        broadcast_socket.send_to(asio::buffer(message), broadcast_endpoint);
+        std::this_thread::sleep_for(std::chrono::seconds(3));
+    }
+}
 
 class SimpleServer {
   public:
@@ -16,7 +35,6 @@ class SimpleServer {
 
     void StartAccept(asio::io_context &context) {
         auto socket = std::make_shared<asio::ip::tcp::socket>(context);
-
         acceptor.async_accept(
             *socket, [this, socket, &context](std::error_code ec) {
                 if (!ec) {
@@ -42,23 +60,13 @@ class SimpleServer {
                 std::string message(buffer->begin(), buffer->begin() + length);
                 std::cout << "Received: " << message << std::endl;
 
-                BroadcastMessage(socket, message, context);
+                SendMessage(socket, message, context);
                 StartReceive(socket, context);
             } else {
                 std::cout << "Connection closed: " << ec.message() << std::endl;
                 RemoveClient(socket);
             }
         });
-    }
-
-    void BroadcastMessage(std::shared_ptr<asio::ip::tcp::socket> sender,
-                          const std::string &message,
-                          asio::io_context &context) {
-        for (const auto &client : clients) {
-            if (client != sender && client->is_open()) {
-                SendMessage(client, message, context);
-            }
-        }
     }
 
     void SendMessage(std::shared_ptr<asio::ip::tcp::socket> socket,
@@ -90,9 +98,13 @@ int main() {
 
     SimpleServer server(context, 12345);
 
+    std::thread broadcast_thread(BroadcastServerPresence, std::ref(context),
+                                 12345);
+
     std::thread server_thread([&context]() { context.run(); });
 
     server_thread.join();
+    broadcast_thread.join();
 
     return 0;
 }
