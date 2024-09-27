@@ -1,43 +1,47 @@
 # Bear Messenger
 
-This project is a simple TCP messaging application built using Asio (Standalone or Boost). It consists of a client that sends messages to a server, and the server echoes the messages back to the client.
+This project is a simple TCP messaging application built using Asio. It consists of a client that sends messages to a server, and the server echoes the messages back to the client.
 
 ## Features
 - Supports multiple clients
 - Asynchronous communication using Asio
 - Simple echo server
+- Easy installation via Homebrew
 
 ## Requirements
 - C++14 or higher
-- Asio (Standalone) or Boost.Asio
-- GCC/Clang/Visual Studio (for compiling)
-  
+- Asio (Standalone) or Boost.Asio (Handled automatically if installed via Homebrew)
+- GCC/Clang (for compiling)
+
 ## Installation
 
-1. Clone the repository:
+### Option 1: Install via Homebrew (Recommended)
+
+1. Tap the repository and install Bear Messenger:
    ```bash
-   git clone https://github.com/vic-gamboa/BearMessenger.git
-2. Install necessary dependencies (e.g., Boost, Asio):
-   - For Ubuntu/Linux:
+   brew tap vic-gamboa/bearmessenger
+   brew install bearmessenger
+   ```
+
+   This will automatically install Bear Messenger along with its dependencies (Boost and Asio) via Homebrew.
+
+2. Run the server and client:
+   - To run the server:
      ```bash
-     sudo apt install libasio-dev libboost-all-dev
+     bearmessenger server
      ```
-   - For macOS:
+
+   - To run the client:
      ```bash
-     brew install boost asio
+     bearmessenger client
      ```
 
-3. Compile the project:
-   ```bash
-   make
-   ```
+   The `bearmessenger` command will launch both server and client terminals automatically based on the script.
 
-4. Run the server:
-   ```bash
-   ./server
-   ```
+## Usage
 
-5. Run the client:
-   ```bash
-   ./client
-   ```
+Once both the server and client are running, you can send messages from the client to the server, and the server will echo them back to the client.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
