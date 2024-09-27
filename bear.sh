@@ -3,7 +3,6 @@
 install_script() {
     SCRIPT_NAME="bearmessenger"
     
-    # Detect if this is an ARM-based Mac (M1/M2) or Intel-based
     if [[ $(uname -m) == 'arm64' ]]; then
         INSTALL_DIR="/opt/homebrew/bin"
     else
@@ -28,8 +27,11 @@ install_script() {
 
 install_script
 
-APP_DIR="$(cd "$(dirname "$0")" && pwd)"
-
+if [[ $(uname -m) == 'arm64' ]]; then
+    APP_DIR="/opt/homebrew/bin"
+else
+    APP_DIR="/usr/local/bin"
+fi
 osascript -e "tell application \"Terminal\" to do script \"cd $APP_DIR && ./server\""
 
 osascript -e "tell application \"Terminal\" to do script \"cd $APP_DIR && ./client\""
