@@ -15,7 +15,7 @@ This project is a simple TCP messaging application built using Asio. It consists
 
 ## Installation
 
-### Option 1: Install via Homebrew (Recommended)
+### Option 1: Install via Homebrew
 
 1. Tap the repository and install Bear Messenger:
    ```bash
