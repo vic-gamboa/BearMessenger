@@ -1,6 +1,10 @@
 #include <asio.hpp>
 #include <iostream>
+#include <string>
 #include <thread>
+#include <vector>
+
+void ClearCurrentLine() { std::cout << "\33[2K\r"; }
 
 int main() {
     asio::io_context context;
@@ -19,8 +23,12 @@ int main() {
             asio::error_code ec;
             size_t length = socket.read_some(asio::buffer(buffer), ec);
             if (!ec) {
+                ClearCurrentLine();
+
                 std::cout << "Received: " << std::string(buffer.data(), length)
                           << std::endl;
+
+                std::cout << "Enter message: " << std::flush;
             } else {
                 std::cout << "Connection closed by server: " << ec.message()
                           << std::endl;

@@ -42,13 +42,23 @@ class SimpleServer {
                 std::string message(buffer->begin(), buffer->begin() + length);
                 std::cout << "Received: " << message << std::endl;
 
-                SendMessage(socket, message, context);
+                BroadcastMessage(socket, message, context);
                 StartReceive(socket, context);
             } else {
                 std::cout << "Connection closed: " << ec.message() << std::endl;
                 RemoveClient(socket);
             }
         });
+    }
+
+    void BroadcastMessage(std::shared_ptr<asio::ip::tcp::socket> sender,
+                          const std::string &message,
+                          asio::io_context &context) {
+        for (const auto &client : clients) {
+            if (client != sender && client->is_open()) {
+                SendMessage(client, message, context);
+            }
+        }
     }
 
     void SendMessage(std::shared_ptr<asio::ip::tcp::socket> socket,
