@@ -2,7 +2,12 @@
 
 install_script() {
     SCRIPT_NAME="bearmessenger"
-    
+
+    if [[ "$1" == "--local" ]]; then
+        echo "Running in local mode, skipping installation."
+        return
+    fi
+
     if [[ $(uname -m) == 'arm64' ]]; then
         INSTALL_DIR="/opt/homebrew/bin"
     else
@@ -25,7 +30,7 @@ install_script() {
     fi
 }
 
-install_script
+install_script "$1"
 
 if [[ $(uname -m) == 'arm64' ]]; then
     APP_DIR="/opt/homebrew/bin"
