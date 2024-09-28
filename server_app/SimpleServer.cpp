@@ -69,20 +69,26 @@ class SimpleServer {
         });
     }
 
-    void SendMessage(std::shared_ptr<asio::ip::tcp::socket> socket,
+    void SendMessage(std::shared_ptr<asio::ip::tcp::socket> sender_socket,
                      const std::string &message, asio::io_context &context) {
         auto buffer =
             std::make_shared<std::vector<char>>(message.begin(), message.end());
-        asio::async_write(*socket, asio::buffer(*buffer),
-                          [buffer](std::error_code ec, std::size_t length) {
-                              if (!ec) {
-                                  std::cout << "Sent: " << length << " bytes"
-                                            << std::endl;
-                              } else {
-                                  std::cout << "Failed to send message: "
-                                            << ec.message() << std::endl;
-                              }
-                          });
+        for (const auto &client_socket : clients) {
+            if (client_socket != sender_socket && client_socket->is_open()) {
+                asio::async_write(
+                    *client_socket, asio::buffer(*buffer),
+                    [buffer](std::error_code ec, std::size_t length) {
+                        if (!ec) {
+                            std::cout << "Broadcasted: " << length << " bytes"
+                                      << std::endl;
+                        } else {
+                            std::cout
+                                << "Failed to send message: " << ec.message()
+                                << std::endl;
+                        }
+                    });
+            }
+        }
     }
 
     void RemoveClient(std::shared_ptr<asio::ip::tcp::socket> socket) {
